@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <title>Instagram Saved Exporter</title>
+  <style>
+    body {
+      width: 320px;
+      font-family: -apple-system, Segoe UI, Roboto, sans-serif;
+      padding: 14px;
+      color: #222;
+    }
+    h1 { font-size: 15px; margin: 0 0 6px; }
+    h2 { font-size: 12px; margin: 14px 0 4px; color: #555; text-transform: uppercase; }
+    p.hint { font-size: 12px; color: #666; margin: 0 0 10px; }
+    .count { font-size: 28px; font-weight: 700; margin: 4px 0; }
+    .row { display: flex; gap: 8px; margin-top: 6px; }
+    button {
+      flex: 1;
+      padding: 8px 6px;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    #start { background: #2d8f4e; color: #fff; }
+    #stop { background: #b23b3b; color: #fff; }
+    #enrich { background: #3a5fce; color: #fff; }
+    #downloadMedia { background: #3a5fce; color: #fff; }
+    #exportCsv, #exportJson { background: #eee; color: #222; }
+    #clear { background: none; color: #b23b3b; text-decoration: underline; font-size: 12px; padding: 4px; }
+    .status { font-size: 12px; margin-top: 8px; color: #444; min-height: 16px; }
+    hr { border: none; border-top: 1px solid #eee; margin: 12px 0; }
+  </style>
+</head>
+<body>
+  <h1>Instagram Saved Exporter</h1>
+  <p class="hint">Abra a coleção de Salvos que você quer exportar antes de usar.</p>
+
+  <div class="count" id="count">0</div>
+  <div class="status" id="status">itens capturados na grade</div>
+  <div class="hint" id="breakdown" style="font-size:11px;color:#777;margin-top:-2px;"></div>
+  <div class="hint" id="pageDetected" style="font-size:11px;color:#999;margin-top:2px;"></div>
+
+  <h2>1. Capturar a grade</h2>
+  <div class="row">
+    <button id="start">▶ Auto-scroll</button>
+    <button id="stop">■ Parar</button>
+  </div>
+
+  <h2>2. Buscar mídia completa</h2>
+  <p class="hint">Abre cada post numa aba em segundo plano e percorre os slides do carrossel/vídeo. Mais lento, mas não depende de nenhum endpoint escondido.</p>
+  <div class="row">
+    <button id="enrich">🔎 Enriquecer mídia completa</button>
+  </div>
+
+  <hr />
+
+  <div class="row">
+    <button id="exportCsv">Exportar CSV</button>
+    <button id="exportJson">Exportar JSON</button>
+  </div>
+  <div class="row">
+    <button id="downloadMedia">⬇ Baixar arquivos</button>
+  </div>
+  <button id="exportSqlLooks" style="width:100%; margin-top:8px; background:#7c3aed; color:white; padding:8px; border:none; border-radius:6px; cursor:pointer;">
+    Gerar SQL para Looks
+  </button>
+
+  <button id="clear">Limpar dados capturados</button>
+
+  <hr />
+  <details>
+    <summary style="font-size:12px;cursor:pointer;color:#555;">Diagnóstico (se não capturar nada)</summary>
+    <div id="scanInfo" style="font-size:11px;color:#777;margin:6px 0;"></div>
+    <button id="runDiagnostic" style="width:100%;background:#eee;color:#222;">🔍 Rodar diagnóstico completo</button>
+    <div id="debugList" style="font-size:10px;max-height:160px;overflow-y:auto;margin-top:6px;word-break:break-all;color:#555;"></div>
+  </details>
+
+  <script src="popup.js"></script>
+</body>
+</html>
