@@ -99,6 +99,43 @@ function toCsv(items) {
   return lines.join("\n");
 }
 
+// CSV para Excel (Brasil): ponto-e-vírgula + BOM UTF-8 para acentos
+function toExcelCsv(items) {
+  const BOM = "\uFEFF";
+  const sep = ";";
+  const headers = [
+    "shortcode",
+    "url",
+    "owner_username",
+    "colecao",
+    "media_type",
+    "media_count",
+    "caption",
+    "media_urls",
+    "captured_at",
+  ];
+  const escape = (v) => {
+    const s = String(v ?? "").replace(/"/g, '""').replace(/\r?\n/g, " ");
+    return `"${s}"`;
+  };
+  const lines = [headers.join(sep)];
+  for (const item of items) {
+    const row = [
+      item.shortcode,
+      item.url,
+      item.owner_username,
+      item.collection,
+      item.media_type,
+      item.media?.length || 0,
+      item.caption,
+      (item.media || []).map((m) => m.url).join(" | "),
+      item.captured_at,
+    ];
+    lines.push(row.map(escape).join(sep));
+  }
+  return BOM + lines.join("\r\n");
+}
+
 function download(content, filename, mime) {
   const blob = new Blob([content], { type: mime });
   const url = URL.createObjectURL(blob);
@@ -109,12 +146,38 @@ function download(content, filename, mime) {
 
 document.getElementById("exportCsv").addEventListener("click", async () => {
   const items = await getItems();
-  download(toCsv(items), "instagram_saved.csv", "text/csv");
+  if (items.length === 0) {
+    document.getElementById("status").textContent = "Nenhum item capturado.";
+    return;
+  }
+  download(toCsv(items), "instagram_saved.csv", "text/csv;charset=utf-8");
+  document.getElementById("status").textContent = "CSV baixado.";
 });
 
 document.getElementById("exportJson").addEventListener("click", async () => {
   const items = await getItems();
+  if (items.length === 0) {
+    document.getElementById("status").textContent = "Nenhum item capturado.";
+    return;
+  }
   download(JSON.stringify(items, null, 2), "instagram_saved.json", "application/json");
+  document.getElementById("status").textContent = "JSON baixado.";
+});
+
+document.getElementById("exportExcel").addEventListener("click", async () => {
+  const items = await getItems();
+  if (items.length === 0) {
+    document.getElementById("status").textContent = "Nenhum item capturado.";
+    return;
+  }
+  // Abre direto no Excel (CSV com ; e BOM)
+  download(
+    toExcelCsv(items),
+    "instagram_saved_excel.csv",
+    "text/csv;charset=utf-8"
+  );
+  document.getElementById("status").textContent =
+    "Excel gerado (" + items.length + " linhas). Abra no Excel.";
 });
 
 document.getElementById("downloadMedia").addEventListener("click", () => {
@@ -144,7 +207,7 @@ async function renderDiagnostic() {
   }
   const lines = [
     `<b>Página:</b> ${d.pathname}`,
-    `<b>Total de &lt;a href&gt; na página:</b> ${d.totalAnchors}`,
+    `<b>Total de <a href> na página:</b> ${d.totalAnchors}`,
     `<b>Elementos role=link/button:</b> ${d.roleElements}`,
     `<b>Links parecidos com post/reel:</b> ${d.suspects.length}`,
   ];
